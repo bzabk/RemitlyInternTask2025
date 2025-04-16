@@ -2,7 +2,7 @@ package com.example.remitlyintern.Controller;
 
 import com.example.remitlyintern.Dto.BranchDTO;
 import com.example.remitlyintern.Dto.HeadquarterDTO;
-import com.example.remitlyintern.Exceptions.NotFoundElement;
+import com.example.remitlyintern.Exceptions.NotFoundElementException;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import com.example.remitlyintern.Service.SwiftCodeService;
@@ -26,12 +26,14 @@ public class SwiftCodeController {
         this.swiftCodeService = swiftCodeService;
     }
 
+
+
     @GetMapping("/{swiftCode}")
     public ResponseEntity<?> findSwiftCodeDetails(@PathVariable
-                                             @Pattern(regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-                                                     message = "Input does not satisfy required swift code regex")  String swiftCode) {
+                                                      @Pattern(regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$", message = "Input must contain only uppercase letters and digits in the SWIFT code format")  String swiftCode) {
+
         SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
-                .orElseThrow(() -> new NotFoundElement("The provided SWIFT code does not exist in the database"));
+                .orElseThrow(() -> new NotFoundElementException("The provided SWIFT code does not exist in the database"));
         if(foundSwiftCode.isHeadquarter()){
             HeadquarterDTO headquarterDTO = swiftCodeService.convertToHeadquaterDTO(foundSwiftCode);
             headquarterDTO.setBranches(swiftCodeService.convertToBranchDTO(foundSwiftCode.getChildren()));

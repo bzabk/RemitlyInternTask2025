@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.util.InvalidUrlException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -13,10 +14,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(e.getMessage());
+                .body("Input does not satisfy required swift code regex");
     }
 
-    @ExceptionHandler(NotFoundElement.class)
+    @ExceptionHandler(NotFoundElementException.class)
     public ResponseEntity<Object> handleNotFoundElement(Exception e){
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
