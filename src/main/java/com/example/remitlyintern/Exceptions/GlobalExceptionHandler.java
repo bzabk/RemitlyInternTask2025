@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundElementException.class)
     public ResponseEntity<Object> handleNotFoundElement(Exception e){
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());

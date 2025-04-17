@@ -10,5 +10,7 @@ public interface SwiftCodeRepository extends JpaRepository<SwiftCode,String> {
 
     Optional<SwiftCode> findBySwiftCode(String swiftCode);
 
-    List<SwiftCode> findAllByCountryIso2(String countryISO);
+    List<SwiftCode> findAllByCountryISO2(String countryISO);
+
+
 }

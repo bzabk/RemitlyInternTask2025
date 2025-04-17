@@ -1,7 +1,10 @@
 package com.example.remitlyintern.Service;
 
 import com.example.remitlyintern.Dto.*;
+import com.example.remitlyintern.Exceptions.NotFoundElementException;
 import com.example.remitlyintern.Model.SwiftCode;
+import com.example.remitlyintern.Repository.SwiftCodeRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +12,44 @@ import java.util.stream.Collectors;
 
 @Service
 public class SwiftCodeService {
+
+    private final SwiftCodeRepository swiftCodeRepository;
+
+    public SwiftCodeService(SwiftCodeRepository swiftCodeRepository) {
+        this.swiftCodeRepository = swiftCodeRepository;
+    }
+
+    public Object getSwiftCodeDetails(String swiftCode) {
+        SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
+                .orElseThrow(() -> new NotFoundElementException("The provided SWIFT code does not exist in the database"));
+
+        if (foundSwiftCode.getHeadquarter()) {
+            HeadquarterDTO headquarterDTO = convertToHeadquaterDTO(foundSwiftCode);
+            headquarterDTO.setBranches(convertToBranchDTO(foundSwiftCode.getChildren()));
+            return headquarterDTO;
+        } else {
+            return convertSwiftCodeToBranchWithCountryName(foundSwiftCode);
+        }
+    }
+
+    public Object getSwiftCodesByCountryISO2(String countryISO2){
+        List<SwiftCode> listOfSwiftCodes = swiftCodeRepository.findAllByCountryISO2(countryISO2);
+
+        if(listOfSwiftCodes.isEmpty()){
+            throw new NotFoundElementException("No Banks with entered countryISO in database");
+        }
+
+        CountryDetailsDTO countryDetailsDTO = new CountryDetailsDTO(countryISO2,
+                listOfSwiftCodes.stream()
+                        .findFirst()
+                        .map(SwiftCode::getCountryName)
+                        .orElse(""));
+
+        listOfSwiftCodes.forEach(swiftCode -> {
+            countryDetailsDTO.getBranchDTOList().add(convertSwiftCodeToBranchDTO(swiftCode));
+        });
+        return countryDetailsDTO;
+    }
 
     public HeadquarterDTO convertToHeadquaterDTO(SwiftCode swiftCode) {
            return new HeadquarterDTO(

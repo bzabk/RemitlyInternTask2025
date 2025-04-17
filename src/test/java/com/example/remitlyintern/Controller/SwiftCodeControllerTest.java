@@ -1,6 +1,7 @@
 package com.example.remitlyintern.Controller;
 
 import com.example.remitlyintern.Dto.BranchWithCountryName;
+import com.example.remitlyintern.Exceptions.NotFoundElementException;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import com.example.remitlyintern.Service.SwiftCodeService;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SwiftCodeController.class)
@@ -54,15 +56,13 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnBranchDetailsForValidBranchSwiftCode() throws Exception {
-        SwiftCode swiftCode = createSwiftCode();
         BranchWithCountryName branchDTO = createBranchDTO();
 
-        when(swiftCodeRepository.findBySwiftCode("BCHICLRMIMP"))
-                .thenReturn(Optional.of(swiftCode));
-        when(swiftCodeService.convertSwiftCodeToBranchWithCountryName(swiftCode))
+        when(swiftCodeService.getSwiftCodeDetails("BCHICLRMIMP"))
                 .thenReturn(branchDTO);
 
         mockMvc.perform(get("/v1/swift-codes/BCHICLRMIMP"))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bankName").value("BANCO DE CHILE"))
                 .andExpect(jsonPath("$.countryISO2").value("CL"))
@@ -101,6 +101,9 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenSwiftCodeIsNotInDatabase() throws Exception {
+        when(swiftCodeService.getSwiftCodeDetails("BCHICLQQIMP"))
+                .thenThrow(new NotFoundElementException("The provided SWIFT code does not exist in the database"));
+
         mockMvc.perform(get("/v1/swift-codes/BCHICLQQIMP"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("The provided SWIFT code does not exist in the database"));
@@ -132,6 +135,10 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenCountryIsoNotInDataBase() throws Exception{
+
+        when(swiftCodeService.getSwiftCodesByCountryISO2("QA"))
+                .thenThrow(new NotFoundElementException("No Banks with entered countryISO in database"));
+
         mockMvc.perform(get("/v1/swift-codes/country/QA"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No Banks with entered countryISO in database"));
