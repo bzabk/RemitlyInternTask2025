@@ -35,20 +35,20 @@ public class SwiftCodeControllerTest {
         swiftCode.setBankName("BANCO DE CHILE");
         swiftCode.setAddress("");
         swiftCode.setHeadquarter(false);
-        swiftCode.setCountryIso2("CL");
+        swiftCode.setCountryISO2("CL");
         swiftCode.setCountryName("CHILE");
         return swiftCode;
     }
 
     private BranchWithCountryName createBranchDTO() {
-        BranchWithCountryName branchDTO = new BranchWithCountryName();
-        branchDTO.setSwiftCode("BCHICLRMIMP");
-        branchDTO.setBankName("BANCO DE CHILE");
-        branchDTO.setAddress("");
-        branchDTO.setHeadquarter(false);
-        branchDTO.setCountryISO2("CL");
-        branchDTO.setCountryName("CHILE");
-        return branchDTO;
+        return new BranchWithCountryName(
+                " ",
+                "BANCO DE CHILE",
+                false,
+                "BCHICLRMIMP",
+                "CL",
+                "CHILE"
+        );
     }
     //---------------------------------------------------1. Endpoint Tests
 

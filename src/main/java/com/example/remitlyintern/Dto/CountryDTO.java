@@ -1,6 +1,11 @@
 package com.example.remitlyintern.Dto;
 
 public class CountryDTO {
+
+    public CountryDTO(String countryISO2) {
+        this.countryISO2 = countryISO2;
+    }
+
     private String countryISO2;
 
     public String getCountryISO2() {

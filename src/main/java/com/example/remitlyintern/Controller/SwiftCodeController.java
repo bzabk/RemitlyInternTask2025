@@ -54,24 +54,26 @@ public class SwiftCodeController {
     public ResponseEntity<Object> findSwiftCodesByCountryISO(@PathVariable
                                                                  @Pattern(regexp = "^[A-Z]{2}$", message = "Country ISO code must be exactly two uppercase letters")
                                                                  String countryISO2code){
-
         List<SwiftCode> listOfSwiftCodes = swiftCodeRepository.findAllByCountryIso2(countryISO2code);
 
         if(listOfSwiftCodes.isEmpty()){
             throw new NotFoundElementException("No Banks with entered countryISO in database");
         }
-
-        CountryDetailsDTO countryDetailsDTO = new CountryDetailsDTO();
-
-        countryDetailsDTO.setCountryISO2(countryISO2code);
-        countryDetailsDTO.setCountryName(listOfSwiftCodes.stream().findFirst()
-                .map(SwiftCode::getCountryName).toString());
+        CountryDetailsDTO countryDetailsDTO = new CountryDetailsDTO(countryISO2code,
+                listOfSwiftCodes.stream()
+                        .findFirst()
+                        .map(SwiftCode::getCountryName)
+                        .orElse(""));
 
         listOfSwiftCodes.forEach(swiftCode -> {
                         countryDetailsDTO.getBranchDTOList().add(swiftCodeService.convertSwiftCodeToBranchDTO(swiftCode));
                 });
         return ResponseEntity.ok(countryDetailsDTO);
     }
+
+
+
+
 
 
 

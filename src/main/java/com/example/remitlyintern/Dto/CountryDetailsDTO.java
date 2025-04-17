@@ -16,6 +16,11 @@ public class CountryDetailsDTO{
     private List<BranchDTO> branchDTOList;
     private String countryISO2;
 
+    public CountryDetailsDTO(String countryName, String countryISO2) {
+        this.countryName = countryName;
+        this.branchDTOList = new ArrayList<>();
+        this.countryISO2 = countryISO2;
+    }
 
     public String getCountryISO2() {
         return countryISO2;
@@ -26,9 +31,6 @@ public class CountryDetailsDTO{
         this.countryISO2 = countryISO2;
     }
 
-    public CountryDetailsDTO() {
-        this.branchDTOList = new ArrayList<>();
-    }
 
     public String getCountryName() {
         return countryName;

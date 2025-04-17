@@ -18,11 +18,22 @@ public class HeadquarterDTO{
 
     private String address;
     private String bankName;
+    private String countryISO2;
+    private String countryName;
     @JsonProperty("isHeadquarter")
     private boolean headquarter;
     private String swiftCode;
-    private String countryISO2;
+    private List<BranchDTO> branches;
 
+    public HeadquarterDTO(String address, String bankName, String countryISO2, String countryName, boolean headquarter, String swiftCode, List<BranchDTO> branches) {
+        this.address = address;
+        this.bankName = bankName;
+        this.countryISO2 = countryISO2;
+        this.countryName = countryName;
+        this.headquarter = headquarter;
+        this.swiftCode = swiftCode;
+        this.branches = branches;
+    }
 
     public String getAddress() {
         return address;
@@ -72,10 +83,6 @@ public class HeadquarterDTO{
     public void setBankName(String bankName) {
         this.bankName = bankName;
     }
-
-    private List<BranchDTO> branches;
-
-    private String countryName;
 
     public String getCountryName() {
         return countryName;

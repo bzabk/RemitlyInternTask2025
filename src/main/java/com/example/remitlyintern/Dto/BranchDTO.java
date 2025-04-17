@@ -18,6 +18,13 @@ public class BranchDTO {
     private String swiftCode;
     private String countryISO2;
 
+    public BranchDTO(String address, String bankName, boolean headquarter, String swiftCode, String countryISO2) {
+        this.address = address;
+        this.bankName = bankName;
+        this.headquarter = headquarter;
+        this.swiftCode = swiftCode;
+        this.countryISO2 = countryISO2;
+    }
 
     public boolean getHeadquarter() {
         return headquarter;

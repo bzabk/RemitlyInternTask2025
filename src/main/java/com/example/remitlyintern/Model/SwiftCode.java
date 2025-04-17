@@ -1,6 +1,5 @@
 package com.example.remitlyintern.Model;
 
-import com.example.remitlyintern.Dto.HeadquarterDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "swift_codes_mod")
-public class SwiftCode extends HeadquarterDTO {
+public class SwiftCode {
 
     @Id
     @Column(name="swift_code",unique = true, length=11)
@@ -28,7 +27,7 @@ public class SwiftCode extends HeadquarterDTO {
 
     @Column(name="country_iso2",length=2,nullable = false)
     @JsonProperty("countryISO2")
-    private String countryIso2;
+    private String countryISO2;
 
     @Column(name="country_name")
     private String countryName;
@@ -101,12 +100,12 @@ public class SwiftCode extends HeadquarterDTO {
         this.countryName = countryName;
     }
 
-    public String getCountryIso2() {
-        return countryIso2;
+    public String getCountryISO2() {
+        return countryISO2;
     }
 
-    public void setCountryIso2(String countryIso2) {
-        this.countryIso2 = countryIso2;
+    public void setCountryISO2(String countryIso2) {
+        this.countryISO2 = countryIso2;
     }
 
     public String getTownName() {

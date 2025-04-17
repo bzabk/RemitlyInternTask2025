@@ -10,72 +10,74 @@ import java.util.stream.Collectors;
 @Service
 public class SwiftCodeService {
 
-    public HeadquarterDTO convertToHeadquaterDTO(SwiftCode swiftCode){
-        HeadquarterDTO dto = new HeadquarterDTO();
-        dto.setAddress(swiftCode.getAddress());
-        dto.setBankName(swiftCode.getBankName());
-        dto.setCountryISO2((swiftCode.getCountryIso2()));
-        dto.setCountryName(swiftCode.getCountryName());
-        dto.setHeadquarter(swiftCode.getHeadquarter());
-        dto.setSwiftCode(swiftCode.getSwiftCode());
-        return dto;
-    }
+    public HeadquarterDTO convertToHeadquaterDTO(SwiftCode swiftCode) {
+           return new HeadquarterDTO(
+               swiftCode.getAddress(),
+               swiftCode.getBankName(),
+               swiftCode.getCountryISO2(),
+               swiftCode.getCountryName(),
+               swiftCode.getHeadquarter(),
+               swiftCode.getSwiftCode(),
+               convertToBranchDTO(swiftCode.getChildren())
+           );
+       }
 
     public CountryDTO convertSwiftCodeToCountryDTO(SwiftCode swiftCode){
-        CountryDTO countryDTO = new CountryDTO();
-        countryDTO.setCountryISO2(swiftCode.getCountryISO2());
-        return countryDTO;
+        return new CountryDTO(
+                swiftCode.getCountryISO2()
+        );
     }
+
 
     public CountryDetailsDTO convertSwiftCodeToCountryDetailsDTO(SwiftCode swiftCode){
-        CountryDetailsDTO countryDetailsDTO = new CountryDetailsDTO();
-        countryDetailsDTO.setBranchDTOList(convertToBranchDTO(swiftCode.getChildren()));
-        countryDetailsDTO.setCountryName(swiftCode.getCountryName());
-        countryDetailsDTO.setCountryISO2(swiftCode.getCountryISO2());
-        return countryDetailsDTO;
+        return new CountryDetailsDTO(
+                swiftCode.getCountryName(),
+                swiftCode.getCountryISO2()
+        );
     }
 
+
     public BranchWithCountryName convertSwiftCodeToBranchWithCounryName(SwiftCode swiftCode){
-        BranchWithCountryName branchWithCountryName = new BranchWithCountryName();
-        branchWithCountryName.setCountryName(swiftCode.getCountryName());
-        branchWithCountryName.setBankName(swiftCode.getBankName());
-        branchWithCountryName.setAddress(swiftCode.getSwiftCode());
-        branchWithCountryName.setHeadquarter(swiftCode.getHeadquarter());
-        branchWithCountryName.setCountryISO2(swiftCode.getCountryISO2());
-        return branchWithCountryName;
+        return new BranchWithCountryName(
+            swiftCode.getAddress(),
+            swiftCode.getBankName(),
+            swiftCode.getHeadquarter(),
+            swiftCode.getSwiftCode(),
+            swiftCode.getCountryISO2(),
+            swiftCode.getCountryName()
+        );
     }
 
     public List<BranchDTO> convertToBranchDTO(List<SwiftCode> children) {
-        return children.stream().map(child -> {
-            BranchDTO dto = new BranchDTO();
-            dto.setAddress(child.getAddress());
-            dto.setBankName(child.getBankName());
-            dto.setCountryISO2(child.getCountryIso2());
-            dto.setHeadquarter(child.getHeadquarter());
-            dto.setSwiftCode(child.getSwiftCode());
-            return dto;
-        }).collect(Collectors.toList());
+        return children.stream()
+                .map(child -> new BranchDTO(
+                        child.getAddress(),
+                        child.getBankName(),
+                        child.getHeadquarter(),
+                        child.getSwiftCode(),
+                        child.getCountryISO2()))
+                .collect(Collectors.toList());
     }
 
-    public BranchWithCountryName convertSwiftCodeToBranchWithCountryName(SwiftCode child){
-        BranchWithCountryName dto = new BranchWithCountryName();
-        dto.setAddress(child.getAddress());
-        dto.setBankName(child.getBankName());
-        dto.setCountryISO2(child.getCountryIso2());
-        dto.setHeadquarter(child.getHeadquarter());
-        dto.setSwiftCode(child.getSwiftCode());
-        dto.setCountryName(child.getCountryName());
-        return dto;
+    public BranchWithCountryName convertSwiftCodeToBranchWithCountryName(SwiftCode child) {
+        return new BranchWithCountryName(
+                child.getAddress(),
+                child.getBankName(),
+                child.getHeadquarter(),
+                child.getSwiftCode(),
+                child.getCountryISO2(),
+                child.getCountryName()
+        );
     }
 
     public BranchDTO convertSwiftCodeToBranchDTO(SwiftCode swiftCode){
-        BranchDTO branchDTO =  new BranchDTO();
-        branchDTO.setCountryISO2(swiftCode.getCountryISO2());
-        branchDTO.setHeadquarter(swiftCode.getHeadquarter());
-        branchDTO.setAddress(swiftCode.getAddress());
-        branchDTO.setBankName(swiftCode.getBankName());
-        branchDTO.setSwiftCode(swiftCode.getSwiftCode());
-        return branchDTO;
+            return new BranchDTO(
+                swiftCode.getAddress(),
+                swiftCode.getBankName(),
+                swiftCode.getHeadquarter(),
+                swiftCode.getSwiftCode(),
+                swiftCode.getCountryISO2()
+            );
         }
 
 }

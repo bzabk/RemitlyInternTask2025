@@ -22,7 +22,14 @@ public class BranchWithCountryName{
     private String countryName;
 
 
-
+    public BranchWithCountryName(String address, String bankName, boolean headquarter, String swiftCode, String countryISO2, String countryName) {
+        this.address = address;
+        this.bankName = bankName;
+        this.headquarter = headquarter;
+        this.swiftCode = swiftCode;
+        this.countryISO2 = countryISO2;
+        this.countryName = countryName;
+    }
 
     public String getAddress() {
         return address;
