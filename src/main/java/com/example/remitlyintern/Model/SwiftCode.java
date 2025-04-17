@@ -1,9 +1,9 @@
 package com.example.remitlyintern.Model;
 
+import com.example.remitlyintern.Dto.HeadquarterDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "swift_codes_mod")
-public class SwiftCode {
+public class SwiftCode extends HeadquarterDTO {
 
     @Id
     @Column(name="swift_code",unique = true, length=11)
@@ -77,7 +77,7 @@ public class SwiftCode {
         this.parentSwiftCode = parentSwiftCode;
     }
 
-    public boolean isHeadquarter() {
+    public boolean getHeadquarter() {
         return isHeadquarter;
     }
 

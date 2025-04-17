@@ -12,9 +12,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e) {
+        String errorMessage = e.getConstraintViolations().stream()
+                .map(violation -> violation.getMessage())
+                .findFirst()
+                .orElse("Validation error");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body("Input does not satisfy required swift code regex");
+                .body(errorMessage);
     }
 
     @ExceptionHandler(NotFoundElementException.class)

@@ -1,6 +1,5 @@
 package com.example.remitlyintern.Dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -11,13 +10,30 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "isHeadquarter",
         "swiftCode"
 })
-public class BranchDTO extends CountryDTO {
+public class BranchDTO {
     private String address;
     private String bankName;
     @JsonProperty("isHeadquarter")
-    private boolean Headquarter;
+    private boolean headquarter;
     private String swiftCode;
+    private String countryISO2;
 
+
+    public boolean getHeadquarter() {
+        return headquarter;
+    }
+
+    public void setHeadquarter(boolean headquarter) {
+        this.headquarter = headquarter;
+    }
+
+    public String getCountryISO2() {
+        return countryISO2;
+    }
+
+    public void setCountryISO2(String countryISO2) {
+        this.countryISO2 = countryISO2;
+    }
 
     public String getAddress() {
         return address;
@@ -35,13 +51,6 @@ public class BranchDTO extends CountryDTO {
         this.swiftCode = swiftCode;
     }
 
-    public boolean Headquarter() {
-        return Headquarter;
-    }
-
-    public void setHeadquarter(boolean headquarter) {
-        Headquarter = headquarter;
-    }
 
     public String getBankName() {
         return bankName;
