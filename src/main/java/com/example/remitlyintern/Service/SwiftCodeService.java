@@ -6,6 +6,7 @@ import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,15 @@ public class SwiftCodeService {
 
     public SwiftCodeService(SwiftCodeRepository swiftCodeRepository) {
         this.swiftCodeRepository = swiftCodeRepository;
+    }
+
+
+    @Transactional
+    public Object deleteRecordBySwiftCode(String swiftCode){
+        SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
+                .orElseThrow(() -> new NotFoundElementException("The provided SWIFT code does not exist in the database"));
+        swiftCodeRepository.deleteSwiftCodeBySwiftCode(swiftCode);
+        return "Swift Code was deleted successfully";
     }
 
     public Object getSwiftCodeDetails(String swiftCode) {

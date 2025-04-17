@@ -47,7 +47,7 @@ public class SwiftCode {
     private SwiftCode parentSwiftCode;
 
     @OneToMany(mappedBy = "parentSwiftCode",
-    cascade = CascadeType.ALL,orphanRemoval = true)
+    cascade = {},orphanRemoval = false)
     @JsonManagedReference
     private List<SwiftCode> children = new ArrayList<>();
 

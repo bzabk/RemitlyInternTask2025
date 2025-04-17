@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -142,6 +143,39 @@ public class SwiftCodeControllerTest {
         mockMvc.perform(get("/v1/swift-codes/country/QA"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No Banks with entered countryISO in database"));
+    }
+
+
+    @Test
+    void shouldReturnSuccessInformationAfterDeletion() throws Exception{
+        when(swiftCodeService.deleteRecordBySwiftCode("BCHICLRMIMP"))
+                .thenReturn("Swift Code was deleted successfully");
+
+        mockMvc.perform(delete("/v1/swift-codes/BCHICLRMIMP"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Swift Code was deleted successfully"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenSwiftCodeNotInDatBase() throws Exception{
+        when(swiftCodeService.deleteRecordBySwiftCode("BCHICLQMIMP"))
+                .thenReturn("The provided SWIFT code does not exist in the database");
+
+
+        mockMvc.perform(delete("/v1/swift-codes/BCHICLQMIMP"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("The provided SWIFT code does not exist in the database"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenSwiftCodeDoesNotMatchRegex() throws Exception{
+        when(swiftCodeService.deleteRecordBySwiftCode("BCHICL!MIMP"))
+                .thenReturn("Input does not satisfy required swift code regex");
+
+
+        mockMvc.perform(delete("/v1/swift-codes/BCHICL!MIMP"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Input does not satisfy required swift code regex"));
     }
 
 

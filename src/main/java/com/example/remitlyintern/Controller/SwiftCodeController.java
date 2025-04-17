@@ -37,6 +37,13 @@ public class SwiftCodeController {
         return ResponseEntity.ok(swiftCodeService.getSwiftCodesByCountryISO2(countryISO2code));
     }
 
+    @DeleteMapping("/{swift_code}")
+    public ResponseEntity<Object> deleteBySwiftCode(@PathVariable
+                                                    @Pattern(regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+                                                            message = "Input does not satisfy required swift code regex") String swift_code){
+        return ResponseEntity.ok(swiftCodeService.deleteRecordBySwiftCode(swift_code));
+    }
+
 
 
 
