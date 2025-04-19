@@ -1,10 +1,10 @@
 package com.example.remitlyintern.Service;
 
 import com.example.remitlyintern.Dto.*;
-import com.example.remitlyintern.Exceptions.NotFoundElementException;
+import com.example.remitlyintern.Exceptions.*;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
-import org.springframework.http.ResponseEntity;
+import com.example.remitlyintern.Utils.CountryCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +20,56 @@ public class SwiftCodeService {
         this.swiftCodeRepository = swiftCodeRepository;
     }
 
+    public static boolean isValidCountryNameAndCode(String countryName, String isoCode) {
+        CountryCode countryCode = CountryCode.getByCode(isoCode);
+        return countryCode != null && countryCode.getName().equalsIgnoreCase(countryName);
+    }
+
+    @Transactional
+    public Object postNewSwiftCodeRecord(PostSwiftCodeDTO postSwiftCodeDTO){
+
+        SwiftCode parentSwiftCode = null;
+
+        if(CountryCode.getByCode(postSwiftCodeDTO.getCountryISO2())==null){
+            throw new CountryISODoesNotExistException("Provided invalid ISOCode");
+        }
+
+        if(!isValidCountryNameAndCode(postSwiftCodeDTO.getCountryName(), postSwiftCodeDTO.getCountryISO2())){
+            throw new CountryISODoesNotMatchCountryNameException(" ");
+        }
+
+        if(CountryCode.getByCode(postSwiftCodeDTO.getCountryName())==null){
+            throw new CountryISODoesNotMatchCountryNameException("");
+        }
+
+        if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && !postSwiftCodeDTO.Headquarter()){
+            throw new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field");
+        }
+
+        if(!postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && postSwiftCodeDTO.Headquarter()){
+            throw new HeadquarterAndSwiftCodeConflictException("If swiftCode does not end with XXX then it can not be a headquarter");
+        }
+
+        if(swiftCodeRepository.existsBySwiftCode(postSwiftCodeDTO.getSwiftCode())){
+            throw new SwiftCodeAlreadyExistInDataBaseException("Provided SwiftCode already exists in DataBase");
+        }
+
+        SwiftCode swiftCode = new SwiftCode(
+                postSwiftCodeDTO.getSwiftCode(),
+                postSwiftCodeDTO.getBankName(),
+                postSwiftCodeDTO.getAddress(),
+                null,
+                postSwiftCodeDTO.getCountryISO2(),
+                postSwiftCodeDTO.getCountryName(),
+                null,
+                postSwiftCodeDTO.Headquarter(),
+                parentSwiftCode,
+                null
+
+        );
+        swiftCodeRepository.save(swiftCode);
+        return "SwiftCode successfully saved in database";
+    }
 
     @Transactional
     public Object deleteRecordBySwiftCode(String swiftCode){
@@ -72,32 +122,6 @@ public class SwiftCodeService {
                convertToBranchDTO(swiftCode.getChildren())
            );
        }
-
-    public CountryDTO convertSwiftCodeToCountryDTO(SwiftCode swiftCode){
-        return new CountryDTO(
-                swiftCode.getCountryISO2()
-        );
-    }
-
-
-    public CountryDetailsDTO convertSwiftCodeToCountryDetailsDTO(SwiftCode swiftCode){
-        return new CountryDetailsDTO(
-                swiftCode.getCountryName(),
-                swiftCode.getCountryISO2()
-        );
-    }
-
-
-    public BranchWithCountryName convertSwiftCodeToBranchWithCounryName(SwiftCode swiftCode){
-        return new BranchWithCountryName(
-            swiftCode.getAddress(),
-            swiftCode.getBankName(),
-            swiftCode.getHeadquarter(),
-            swiftCode.getSwiftCode(),
-            swiftCode.getCountryISO2(),
-            swiftCode.getCountryName()
-        );
-    }
 
     public List<BranchDTO> convertToBranchDTO(List<SwiftCode> children) {
         return children.stream()

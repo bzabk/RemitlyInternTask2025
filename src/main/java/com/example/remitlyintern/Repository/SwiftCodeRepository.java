@@ -10,6 +10,8 @@ public interface SwiftCodeRepository extends JpaRepository<SwiftCode,String> {
 
     Optional<SwiftCode> findBySwiftCode(String swiftCode);
 
+    boolean existsBySwiftCode(String swiftCode);
+
     List<SwiftCode> findAllByCountryISO2(String countryISO);
 
     void deleteSwiftCodeBySwiftCode(String swiftCode);

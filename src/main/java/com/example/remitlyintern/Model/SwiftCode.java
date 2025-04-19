@@ -51,6 +51,21 @@ public class SwiftCode {
     @JsonManagedReference
     private List<SwiftCode> children = new ArrayList<>();
 
+    public SwiftCode(String swiftCode, String bankName, String address, String townName, String countryISO2, String countryName, String timeZone, boolean isHeadquarter, SwiftCode parentSwiftCode, List<SwiftCode> children) {
+        this.swiftCode = swiftCode;
+        this.bankName = bankName;
+        this.address = address;
+        this.townName = townName;
+        this.countryISO2 = countryISO2;
+        this.countryName = countryName;
+        this.timeZone = timeZone;
+        this.isHeadquarter = isHeadquarter;
+        this.parentSwiftCode = parentSwiftCode;
+        this.children = children;
+    }
+
+    public SwiftCode() {
+    }
 
     public List<SwiftCode> getChildren() {
         return children;

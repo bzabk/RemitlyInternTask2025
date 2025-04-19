@@ -1,7 +1,10 @@
 package com.example.remitlyintern.Controller;
 
 import com.example.remitlyintern.Dto.BranchWithCountryName;
+import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
+import com.example.remitlyintern.Exceptions.HeadquarterAndSwiftCodeConflictException;
 import com.example.remitlyintern.Exceptions.NotFoundElementException;
+import com.example.remitlyintern.Exceptions.SwiftCodeAlreadyExistInDataBaseException;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import com.example.remitlyintern.Service.SwiftCodeService;
@@ -11,9 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,14 +36,18 @@ public class SwiftCodeControllerTest {
 
 
     private SwiftCode createSwiftCode() {
-        SwiftCode swiftCode = new SwiftCode();
-        swiftCode.setSwiftCode("BCHICLRMIMP");
-        swiftCode.setBankName("BANCO DE CHILE");
-        swiftCode.setAddress("");
-        swiftCode.setHeadquarter(false);
-        swiftCode.setCountryISO2("CL");
-        swiftCode.setCountryName("CHILE");
-        return swiftCode;
+        return new SwiftCode(
+                "BCHICLRMIMP", // swiftCode
+                "BANCO DE CHILE", // bankName
+                "", // address
+                null, // townName
+                "CL", // countryISO2
+                "CHILE", // countryName
+                null, // timeZone
+                false, // isHeadquarter
+                null, // parentSwiftCode
+                null // children
+        );
     }
 
     private BranchWithCountryName createBranchDTO() {
@@ -57,10 +64,9 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnBranchDetailsForValidBranchSwiftCode() throws Exception {
-        BranchWithCountryName branchDTO = createBranchDTO();
 
         when(swiftCodeService.getSwiftCodeDetails("BCHICLRMIMP"))
-                .thenReturn(branchDTO);
+                .thenReturn(createBranchDTO());
 
         mockMvc.perform(get("/v1/swift-codes/BCHICLRMIMP"))
                 .andDo(print())
@@ -102,7 +108,7 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenSwiftCodeIsNotInDatabase() throws Exception {
-        when(swiftCodeService.getSwiftCodeDetails("BCHICLQQIMP"))
+        when(swiftCodeService.getSwiftCodeDetails(any(String.class)))
                 .thenThrow(new NotFoundElementException("The provided SWIFT code does not exist in the database"));
 
         mockMvc.perform(get("/v1/swift-codes/BCHICLQQIMP"))
@@ -137,7 +143,7 @@ public class SwiftCodeControllerTest {
     @Test
     void shouldReturnNotFoundWhenCountryIsoNotInDataBase() throws Exception{
 
-        when(swiftCodeService.getSwiftCodesByCountryISO2("QA"))
+        when(swiftCodeService.getSwiftCodesByCountryISO2(any(String.class)))
                 .thenThrow(new NotFoundElementException("No Banks with entered countryISO in database"));
 
         mockMvc.perform(get("/v1/swift-codes/country/QA"))
@@ -148,7 +154,7 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnSuccessInformationAfterDeletion() throws Exception{
-        when(swiftCodeService.deleteRecordBySwiftCode("BCHICLRMIMP"))
+        when(swiftCodeService.deleteRecordBySwiftCode(any(String.class)))
                 .thenReturn("Swift Code was deleted successfully");
 
         mockMvc.perform(delete("/v1/swift-codes/BCHICLRMIMP"))
@@ -158,9 +164,8 @@ public class SwiftCodeControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenSwiftCodeNotInDatBase() throws Exception{
-        when(swiftCodeService.deleteRecordBySwiftCode("BCHICLQMIMP"))
+        when(swiftCodeService.deleteRecordBySwiftCode(any(String.class)))
                 .thenReturn("The provided SWIFT code does not exist in the database");
-
 
         mockMvc.perform(delete("/v1/swift-codes/BCHICLQMIMP"))
                 .andExpect(status().isOk())
@@ -172,11 +177,75 @@ public class SwiftCodeControllerTest {
         when(swiftCodeService.deleteRecordBySwiftCode("BCHICL!MIMP"))
                 .thenReturn("Input does not satisfy required swift code regex");
 
-
         mockMvc.perform(delete("/v1/swift-codes/BCHICL!MIMP"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Input does not satisfy required swift code regex"));
     }
+
+    //-----------------------------------------POST
+
+    @Test
+    void shouldReturnBadRequestWhenSwiftCodeDoesNotMatchRegexPost() throws Exception{
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                    "address": "swietokrzyska",
+                    "bankName": "VELO",
+                    "countryISO2": "PL",
+                    "countryName": "Polska",
+                    "isHeadquarter": true,
+                    "swiftCode": "035APLPXXXX"
+                }
+            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Input does not satisfy required swift code regex"));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSwiftCodeNotEndingWithXXXAndHeadquarterIsTrue() throws Exception {
+
+        when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
+                .thenThrow(new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+            {
+                "address": "swietokrzyska",
+                "bankName": "VELO",
+                "countryISO2": "PL",
+                "countryName": "Polska",
+                "isHeadquarter": true,
+                "swiftCode": "BSCHCLR10R4"
+            }
+        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenSwiftCodesEndWithXXXAndHeadquarterIsFalse() throws Exception {
+
+        when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
+                .thenThrow(new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+            {
+                "address": "swietokrzyska",
+                "bankName": "VELO",
+                "countryISO2": "PL",
+                "countryName": "Polska",
+                "isHeadquarter": false,
+                "swiftCode": "BSCHCLR1XXX"
+            }
+        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+    }
+
 
 
 
