@@ -2,6 +2,7 @@ package com.example.remitlyintern.Controller;
 
 import com.example.remitlyintern.Dto.BranchWithCountryName;
 import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
+import com.example.remitlyintern.Exceptions.CountryISODoesNotMatchWithSwiftCodeException;
 import com.example.remitlyintern.Exceptions.HeadquarterAndSwiftCodeConflictException;
 import com.example.remitlyintern.Exceptions.NotFoundElementException;
 import com.example.remitlyintern.Exceptions.SwiftCodeAlreadyExistInDataBaseException;
@@ -183,6 +184,111 @@ public class SwiftCodeControllerTest {
     }
 
     //-----------------------------------------POST
+
+    // rozmiar address ma by miedzy 1 i 100
+    @Test
+    void shouldReturnBadRequestWhenAdressisLongerThan100Signs() throws Exception{
+        StringBuilder longAddress = new StringBuilder();
+        longAddress.append("a".repeat(102));
+
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                    "address": "%s",
+                    "bankName": "VELO",
+                    "countryISO2": "PL",
+                    "countryName": "Polska",
+                    "isHeadquarter": true,
+                    "swiftCode": "BSCHCLR10RD"
+                }
+            """.formatted(longAddress)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Length of address must be between 1 and 100"));
+    }
+
+    //rozmiar bankName ma być miedzy 1 a 100
+
+    @Test
+    void shouldReturnBadRequestWhenBankNameisLongerThan100Signs() throws Exception{
+        StringBuilder longBankName = new StringBuilder();
+        longBankName.append("a".repeat(102));
+
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                    "address": "swietokrzyska",
+                    "bankName": "%s",
+                    "countryISO2": "PL",
+                    "countryName": "Polska",
+                    "isHeadquarter": true,
+                    "swiftCode": "BSCHCLR10RD"
+                }
+            """.formatted(longBankName)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Length of bankName must be between 1 and 100"));
+    }
+    // regex w countryIso nie pasuje
+    @Test
+    void shouldReturnBadRequestWhenCountryISOIsLongerThan2Signs() throws Exception{
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                    "address": "swietokrzyska",
+                    "bankName": "VELO",
+                    "countryISO2": "PLQ",
+                    "countryName": "Polska",
+                    "isHeadquarter": true,
+                    "swiftCode": "BSCHCLR10RD"
+                }
+            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Country ISO2 must consist of exactly 2 uppercase letters."));
+    }
+    //countryIso nie moze zawierac cyfr
+    @Test
+    void shouldReturnBadRequestWhenCountryISOContainsDigits() throws Exception{
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                    "address": "swietokrzyska",
+                    "bankName": "VELO",
+                    "countryISO2": "2P",
+                    "countryName": "Polska",
+                    "isHeadquarter": true,
+                    "swiftCode": "BSCHCLR10RD"
+                }
+            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Country ISO2 must consist of exactly 2 uppercase letters."));
+    }
+    // countryiso musi matchować sie z 5 i 6 znakiem z swiftCode
+    @Test
+    void shouldReturnBadRequestWhenCountryISODoesNotMatchWith5and6SignFromSwiftCode() throws Exception{
+
+        when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
+                .thenThrow(new CountryISODoesNotMatchWithSwiftCodeException(
+                        "CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO"));
+        mockMvc.perform(post("/v1/swift-codes")
+                        .contentType("application/json")
+                        .content("""
+                {
+                "address": "swietokrzyska",
+                "bankName": "VELO",
+                "countryISO2": "PL",
+                "countryName": "Polska",
+                "isHeadquarter": true,
+                "swiftCode": "BSCHPRR1XXX"
+                }
+            """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO"));
+    }
+
+
 
     @Test
     void shouldReturnBadRequestWhenSwiftCodeDoesNotMatchRegexPost() throws Exception{

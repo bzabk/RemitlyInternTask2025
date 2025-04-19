@@ -20,26 +20,20 @@ public class SwiftCodeService {
         this.swiftCodeRepository = swiftCodeRepository;
     }
 
-    public static boolean isValidCountryNameAndCode(String countryName, String isoCode) {
-        CountryCode countryCode = CountryCode.getByCode(isoCode);
-        return countryCode != null && countryCode.getName().equalsIgnoreCase(countryName);
-    }
 
     @Transactional
     public Object postNewSwiftCodeRecord(PostSwiftCodeDTO postSwiftCodeDTO){
 
         SwiftCode parentSwiftCode = null;
 
+        String countryISOFromSwiftCode = postSwiftCodeDTO.getSwiftCode().substring(4,6);
+
+        if (!postSwiftCodeDTO.getCountryISO2().equalsIgnoreCase(countryISOFromSwiftCode)) {
+            throw new CountryISODoesNotMatchWithSwiftCodeException("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO");
+        }
+
         if(CountryCode.getByCode(postSwiftCodeDTO.getCountryISO2())==null){
             throw new CountryISODoesNotExistException("Provided invalid ISOCode");
-        }
-
-        if(!isValidCountryNameAndCode(postSwiftCodeDTO.getCountryName(), postSwiftCodeDTO.getCountryISO2())){
-            throw new CountryISODoesNotMatchCountryNameException(" ");
-        }
-
-        if(CountryCode.getByCode(postSwiftCodeDTO.getCountryName())==null){
-            throw new CountryISODoesNotMatchCountryNameException("");
         }
 
         if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && !postSwiftCodeDTO.Headquarter()){

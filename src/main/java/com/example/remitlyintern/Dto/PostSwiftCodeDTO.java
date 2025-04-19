@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class PostSwiftCodeDTO {
+
     @Size(min = 1, max = 100,message = "Length of address must be between 1 and 100")
     private String address;
 
