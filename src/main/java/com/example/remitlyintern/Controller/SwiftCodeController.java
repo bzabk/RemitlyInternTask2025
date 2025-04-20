@@ -1,9 +1,7 @@
 package com.example.remitlyintern.Controller;
 import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
-import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Service.SwiftCodeService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

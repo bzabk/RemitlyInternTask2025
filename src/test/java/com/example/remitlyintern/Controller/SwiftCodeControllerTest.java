@@ -5,7 +5,6 @@ import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
 import com.example.remitlyintern.Exceptions.CountryISODoesNotMatchWithSwiftCodeException;
 import com.example.remitlyintern.Exceptions.HeadquarterAndSwiftCodeConflictException;
 import com.example.remitlyintern.Exceptions.NotFoundElementException;
-import com.example.remitlyintern.Exceptions.SwiftCodeAlreadyExistInDataBaseException;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import com.example.remitlyintern.Service.SwiftCodeService;
@@ -38,16 +37,16 @@ public class SwiftCodeControllerTest {
 
     private SwiftCode createSwiftCode() {
         return new SwiftCode(
-                "BCHICLRMIMP", // swiftCode
-                "BANCO DE CHILE", // bankName
-                "", // address
-                null, // townName
-                "CL", // countryISO2
-                "CHILE", // countryName
-                null, // timeZone
-                false, // isHeadquarter
-                null, // parentSwiftCode
-                null // children
+                "BCHICLRMIMP",
+                "BANCO DE CHILE",
+                "",
+                null,
+                "CL",
+                "CHILE",
+                null,
+                false,
+                null,
+                null
         );
     }
 
@@ -185,7 +184,6 @@ public class SwiftCodeControllerTest {
 
     //-----------------------------------------POST
 
-    // rozmiar address ma by miedzy 1 i 100
     @Test
     void shouldReturnBadRequestWhenAdressisLongerThan100Signs() throws Exception{
         StringBuilder longAddress = new StringBuilder();
@@ -207,7 +205,6 @@ public class SwiftCodeControllerTest {
                 .andExpect(content().string("Length of address must be between 1 and 100"));
     }
 
-    //rozmiar bankName ma być miedzy 1 a 100
 
     @Test
     void shouldReturnBadRequestWhenBankNameisLongerThan100Signs() throws Exception{
@@ -247,7 +244,7 @@ public class SwiftCodeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Country ISO2 must consist of exactly 2 uppercase letters."));
     }
-    //countryIso nie moze zawierac cyfr
+
     @Test
     void shouldReturnBadRequestWhenCountryISOContainsDigits() throws Exception{
         mockMvc.perform(post("/v1/swift-codes")
@@ -265,7 +262,7 @@ public class SwiftCodeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Country ISO2 must consist of exactly 2 uppercase letters."));
     }
-    // countryiso musi matchować sie z 5 i 6 znakiem z swiftCode
+
     @Test
     void shouldReturnBadRequestWhenCountryISODoesNotMatchWith5and6SignFromSwiftCode() throws Exception{
 

@@ -4,7 +4,7 @@ import com.example.remitlyintern.Dto.*;
 import com.example.remitlyintern.Exceptions.*;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
-import com.example.remitlyintern.Utils.CountryCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +32,7 @@ public class SwiftCodeService {
             throw new CountryISODoesNotMatchWithSwiftCodeException("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO");
         }
 
-        if(CountryCode.getByCode(postSwiftCodeDTO.getCountryISO2())==null){
-            throw new CountryISODoesNotExistException("Provided invalid ISOCode");
-        }
+
 
         if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && !postSwiftCodeDTO.Headquarter()){
             throw new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field");
@@ -66,9 +64,9 @@ public class SwiftCodeService {
     }
 
     @Transactional
-    public Object deleteRecordBySwiftCode(String swiftCode){
-        SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
-                .orElseThrow(() -> new NotFoundElementException("The provided SWIFT code does not exist in the database"));
+    public Object deleteRecordBySwiftCode(String swiftCode) {
+        swiftCodeRepository.findBySwiftCode(swiftCode)
+                .orElseThrow(() -> new NotFoundElementException("SWIFT code not found in the database"));
         swiftCodeRepository.deleteSwiftCodeBySwiftCode(swiftCode);
         return "Swift Code was deleted successfully";
     }

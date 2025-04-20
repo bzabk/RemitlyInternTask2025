@@ -32,7 +32,7 @@ public class SwiftCode {
     @Column(name="country_name")
     private String countryName;
 
-    @Column(name = "time_zone", nullable = false)
+    @Column(name = "time_zone")
     private String timeZone;
 
     @Column(name="is_headquarter")
