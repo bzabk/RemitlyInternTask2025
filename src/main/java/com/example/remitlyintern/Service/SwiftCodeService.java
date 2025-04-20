@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,42 +25,68 @@ public class SwiftCodeService {
     @Transactional
     public Object postNewSwiftCodeRecord(PostSwiftCodeDTO postSwiftCodeDTO){
 
-        SwiftCode parentSwiftCode = null;
+        SwiftCode newSwiftCode;
 
         String countryISOFromSwiftCode = postSwiftCodeDTO.getSwiftCode().substring(4,6);
 
         if (!postSwiftCodeDTO.getCountryISO2().equalsIgnoreCase(countryISOFromSwiftCode)) {
             throw new CountryISODoesNotMatchWithSwiftCodeException("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO");
         }
-
-
-
         if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && !postSwiftCodeDTO.Headquarter()){
             throw new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field");
         }
-
         if(!postSwiftCodeDTO.getSwiftCode().endsWith("XXX") && postSwiftCodeDTO.Headquarter()){
             throw new HeadquarterAndSwiftCodeConflictException("If swiftCode does not end with XXX then it can not be a headquarter");
         }
-
         if(swiftCodeRepository.existsBySwiftCode(postSwiftCodeDTO.getSwiftCode())){
             throw new SwiftCodeAlreadyExistInDataBaseException("Provided SwiftCode already exists in DataBase");
         }
 
-        SwiftCode swiftCode = new SwiftCode(
-                postSwiftCodeDTO.getSwiftCode(),
-                postSwiftCodeDTO.getBankName(),
-                postSwiftCodeDTO.getAddress(),
-                null,
-                postSwiftCodeDTO.getCountryISO2(),
-                postSwiftCodeDTO.getCountryName(),
-                null,
-                postSwiftCodeDTO.Headquarter(),
-                parentSwiftCode,
-                null
 
-        );
-        swiftCodeRepository.save(swiftCode);
+        if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX")){
+            // case when swiftCode is a headquarter
+            newSwiftCode = new SwiftCode(
+                    postSwiftCodeDTO.getSwiftCode(),
+                    postSwiftCodeDTO.getBankName(),
+                    postSwiftCodeDTO.getAddress(),
+                    null,
+                    postSwiftCodeDTO.getCountryISO2(),
+                    postSwiftCodeDTO.getCountryName(),
+                    null,
+                    postSwiftCodeDTO.Headquarter(),
+                    null,
+                    null
+            );
+            String mainPart = postSwiftCodeDTO.getSwiftCode().substring(0,9);
+            List<SwiftCode> swiftCodesToUpdate = swiftCodeRepository.findAllBySwiftCodeStartingWithAndHeadquarterFalse(mainPart);
+            swiftCodesToUpdate.forEach(swiftCode -> {
+                swiftCode.setParentSwiftCode(newSwiftCode);
+                swiftCodeRepository.save(swiftCode);
+            });
+        }else{
+            // case when swiftcode is not a headquarter
+            newSwiftCode = new SwiftCode(
+                    postSwiftCodeDTO.getSwiftCode(),
+                    postSwiftCodeDTO.getBankName(),
+                    postSwiftCodeDTO.getAddress(),
+                    null,
+                    postSwiftCodeDTO.getCountryISO2(),
+                    postSwiftCodeDTO.getCountryName(),
+                    null,
+                    postSwiftCodeDTO.Headquarter(),
+                    null,
+                    null
+            );
+            String mainPart = postSwiftCodeDTO.getSwiftCode().substring(0,8);
+            mainPart = mainPart+"XXX";
+            if(swiftCodeRepository.existsBySwiftCode(mainPart)){
+                SwiftCode foundParent = swiftCodeRepository.findBySwiftCode(mainPart)
+                        .orElse(null);
+                System.out.println(foundParent);
+                newSwiftCode.setParentSwiftCode(foundParent);
+            }
+        }
+        swiftCodeRepository.save(newSwiftCode);
         return "SwiftCode successfully saved in database";
     }
 

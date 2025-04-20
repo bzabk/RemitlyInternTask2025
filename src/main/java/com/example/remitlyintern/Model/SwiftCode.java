@@ -37,7 +37,7 @@ public class SwiftCode {
 
     @Column(name="is_headquarter")
     @JsonProperty("isHeadquarter")
-    private boolean isHeadquarter = false;
+    private boolean headquarter = false;
 
 
     @ManyToOne
@@ -59,7 +59,7 @@ public class SwiftCode {
         this.countryISO2 = countryISO2;
         this.countryName = countryName;
         this.timeZone = timeZone;
-        this.isHeadquarter = isHeadquarter;
+        this.headquarter = isHeadquarter;
         this.parentSwiftCode = parentSwiftCode;
         this.children = children;
     }
@@ -92,11 +92,11 @@ public class SwiftCode {
     }
 
     public boolean getHeadquarter() {
-        return isHeadquarter;
+        return headquarter;
     }
 
     public void setHeadquarter(boolean headquarter) {
-        isHeadquarter = headquarter;
+        this.headquarter = headquarter;
     }
 
     public String getTimeZone() {

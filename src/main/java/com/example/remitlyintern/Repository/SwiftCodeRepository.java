@@ -15,4 +15,6 @@ public interface SwiftCodeRepository extends JpaRepository<SwiftCode,String> {
     List<SwiftCode> findAllByCountryISO2(String countryISO);
 
     void deleteSwiftCodeBySwiftCode(String swiftCode);
+
+    List<SwiftCode> findAllBySwiftCodeStartingWithAndHeadquarterFalse(String mainPart);
 }

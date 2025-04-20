@@ -103,13 +103,62 @@ public class IntegrationTest {
         assertFalse(swiftCodeRepository.existsBySwiftCode("ARBPPLPWXXX"));
     }
 
-    // post i podwojny delete
+    @Test
+    void shouldReturnBadRequestAfterTwoDeleteRequest() throws Exception{
+        PostSwiftCodeDTO postSwiftCodeDTO = new PostSwiftCodeDTO(
+                "swietokrzyska",
+                "TEST BANK",
+                "PL",
+                "Poland",
+                true,
+                "ARBPPLPWXXX"
+        );
+        HttpEntity<PostSwiftCodeDTO> requestEntity = new HttpEntity<>(postSwiftCodeDTO);
+        ResponseEntity<String> postResponse = testRestTemplate.exchange(
+                "/v1/swift-codes",
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        );
+        assertEquals(200, postResponse.getStatusCode().value());
+        assertEquals("SwiftCode successfully saved in database",postResponse.getBody());
+
+        ResponseEntity<String> deleteResponse = testRestTemplate.exchange(
+                "/v1/swift-codes/ARBPPLPWXXX",
+                HttpMethod.DELETE,
+                null,
+                String.class
+        );
+        assertEquals(200, deleteResponse.getStatusCode().value());
+        assertEquals("Swift Code was deleted successfully",deleteResponse.getBody());
+
+        assertFalse(swiftCodeRepository.existsBySwiftCode("ARBPPLPWXXX"));
+
+
+        ResponseEntity<String> deleteResponseRepeated = testRestTemplate.exchange(
+                "/v1/swift-codes/ARBPPLPWXXX",
+                HttpMethod.DELETE,
+                null,
+                String.class
+        );
+        assertEquals(404, deleteResponseRepeated .getStatusCode().value());
+        assertEquals("SWIFT code not found in the database",deleteResponseRepeated .getBody());
+
+
+
+
+    }
 
     // wstawianie headquarte potem dzieci i sprawdzenie czy get działa
 
+//    @Test
+//    void shouldReturn
+
+
+
     // wsatwienie heqdaqurter i potem dzieci i sprzwdzenie czy headquarter nadal jest
 
-    // wsatwienie headquarter i sprawdzenie delete na headquarter
+    // wsatwienie headquarter i dzieci sprawdzenie delete na headquarter działa
 
 
 }
