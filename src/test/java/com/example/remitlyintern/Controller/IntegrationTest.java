@@ -144,21 +144,10 @@ public class IntegrationTest {
         assertEquals(404, deleteResponseRepeated .getStatusCode().value());
         assertEquals("SWIFT code not found in the database",deleteResponseRepeated .getBody());
 
-
-
-
     }
 
-    // wstawianie headquarte potem dzieci i sprawdzenie czy get działa
-
-//    @Test
-//    void shouldReturn
 
 
-
-    // wsatwienie heqdaqurter i potem dzieci i sprzwdzenie czy headquarter nadal jest
-
-    // wsatwienie headquarter i dzieci sprawdzenie delete na headquarter działa
 
 
 }

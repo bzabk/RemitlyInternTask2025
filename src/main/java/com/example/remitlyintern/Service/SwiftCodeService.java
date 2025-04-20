@@ -24,12 +24,10 @@ public class SwiftCodeService {
     @Transactional
     public Object postNewSwiftCodeRecord(PostSwiftCodeDTO postSwiftCodeDTO){
 
-        SwiftCode newSwiftCode;
-
         String countryISOFromSwiftCode = postSwiftCodeDTO.getSwiftCode().substring(4,6);
 
         if(!CountryISO2Map.countryIsoToCountryMap.containsKey(postSwiftCodeDTO.getCountryISO2())){
-            throw new CountryISODoesNotExistException("Provided CountryIso does not exist");
+            throw new CountryISODoesNotExistException("Provided CountryIso does not exist in a ISO standard");
         }
         if (!postSwiftCodeDTO.getCountryISO2().equalsIgnoreCase(countryISOFromSwiftCode)) {
             throw new CountryISODoesNotMatchWithSwiftCodeException("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO");
@@ -44,21 +42,20 @@ public class SwiftCodeService {
             throw new SwiftCodeAlreadyExistInDataBaseException("Provided SwiftCode already exists in DataBase");
         }
 
+        SwiftCode newSwiftCode = new SwiftCode(
+                postSwiftCodeDTO.getSwiftCode(),
+                postSwiftCodeDTO.getBankName(),
+                postSwiftCodeDTO.getAddress(),
+                postSwiftCodeDTO.getCountryISO2(),
+                postSwiftCodeDTO.getCountryName(),
+                postSwiftCodeDTO.Headquarter(),
+                null,
+                null
+        );
 
         if(postSwiftCodeDTO.getSwiftCode().endsWith("XXX")){
             // case when swiftCode is a headquarter
-            newSwiftCode = new SwiftCode(
-                    postSwiftCodeDTO.getSwiftCode(),
-                    postSwiftCodeDTO.getBankName(),
-                    postSwiftCodeDTO.getAddress(),
-                    null,
-                    postSwiftCodeDTO.getCountryISO2(),
-                    postSwiftCodeDTO.getCountryName(),
-                    null,
-                    postSwiftCodeDTO.Headquarter(),
-                    null,
-                    null
-            );
+
             String mainPart = postSwiftCodeDTO.getSwiftCode().substring(0,9);
             List<SwiftCode> swiftCodesToUpdate = swiftCodeRepository.findAllBySwiftCodeStartingWithAndHeadquarterFalse(mainPart);
             swiftCodesToUpdate.forEach(swiftCode -> {
@@ -67,18 +64,6 @@ public class SwiftCodeService {
             });
         }else{
             // case when swiftcode is not a headquarter
-            newSwiftCode = new SwiftCode(
-                    postSwiftCodeDTO.getSwiftCode(),
-                    postSwiftCodeDTO.getBankName(),
-                    postSwiftCodeDTO.getAddress(),
-                    null,
-                    postSwiftCodeDTO.getCountryISO2(),
-                    postSwiftCodeDTO.getCountryName(),
-                    null,
-                    postSwiftCodeDTO.Headquarter(),
-                    null,
-                    null
-            );
             String mainPart = postSwiftCodeDTO.getSwiftCode().substring(0,8);
             mainPart = mainPart+"XXX";
             if(swiftCodeRepository.existsBySwiftCode(mainPart)){
@@ -94,8 +79,15 @@ public class SwiftCodeService {
 
     @Transactional
     public Object deleteRecordBySwiftCode(String swiftCode) {
-        swiftCodeRepository.findBySwiftCode(swiftCode)
+        SwiftCode swiftCodeToDelete = swiftCodeRepository.findBySwiftCode(swiftCode)
                 .orElseThrow(() -> new NotFoundElementException("SWIFT code not found in the database"));
+
+        if (swiftCodeToDelete.getHeadquarter() && swiftCodeToDelete.getChildren() != null) {
+            for (SwiftCode child : swiftCodeToDelete.getChildren()) {
+                child.setParentSwiftCode(null);
+                swiftCodeRepository.save(child);
+            }
+        }
         swiftCodeRepository.deleteSwiftCodeBySwiftCode(swiftCode);
         return "Swift Code was deleted successfully";
     }

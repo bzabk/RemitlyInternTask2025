@@ -1,7 +1,6 @@
 package com.example.remitlyintern.Utils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class CountryISO2Map {
 

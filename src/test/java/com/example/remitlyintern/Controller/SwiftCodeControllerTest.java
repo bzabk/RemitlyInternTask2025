@@ -41,10 +41,8 @@ public class SwiftCodeControllerTest {
                 "BCHICLRMIMP",
                 "BANCO DE CHILE",
                 "",
-                null,
                 "CL",
                 "CHILE",
-                null,
                 false,
                 null,
                 null
