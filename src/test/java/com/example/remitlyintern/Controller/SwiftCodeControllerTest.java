@@ -2,6 +2,7 @@ package com.example.remitlyintern.Controller;
 
 import com.example.remitlyintern.Dto.BranchWithCountryName;
 import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
+import com.example.remitlyintern.Exceptions.CountryISODoesNotExistException;
 import com.example.remitlyintern.Exceptions.CountryISODoesNotMatchWithSwiftCodeException;
 import com.example.remitlyintern.Exceptions.HeadquarterAndSwiftCodeConflictException;
 import com.example.remitlyintern.Exceptions.NotFoundElementException;
@@ -347,6 +348,28 @@ public class SwiftCodeControllerTest {
         """))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCountryISODoesNotExist() throws Exception{
+        when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
+                .thenThrow(new CountryISODoesNotExistException("Provided CountryIso does not exist"));
+
+        mockMvc.perform(post("/v1/swift-codes")
+                .contentType("application/json")
+                .content("""
+            {
+                "address": "swietokrzyska",
+                "bankName": "VELO",
+                "countryISO2": "QQ",
+                "countryName": "Polska",
+                "isHeadquarter": true,
+                "swiftCode": "BSCHQQR1XXX"
+            }
+        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Provided CountryIso does not exist"));
+
     }
 
 

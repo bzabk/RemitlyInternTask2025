@@ -2,6 +2,7 @@ package com.example.remitlyintern.Exceptions;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ReportAsSingleViolation;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CountryISODoesNotMatchWithSwiftCodeException.class)
     public ResponseEntity<Object> handleCountryISOSwiftCodeMisMatch(Exception e){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(CountryISODoesNotExistException.class)
+    public ResponseEntity<Object> handleCountryISODoesNotExistException(Exception e){
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());

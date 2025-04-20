@@ -4,12 +4,11 @@ import com.example.remitlyintern.Dto.*;
 import com.example.remitlyintern.Exceptions.*;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
-import org.springframework.http.ResponseEntity;
+import com.example.remitlyintern.Utils.CountryISO2Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +28,9 @@ public class SwiftCodeService {
 
         String countryISOFromSwiftCode = postSwiftCodeDTO.getSwiftCode().substring(4,6);
 
+        if(!CountryISO2Map.countryIsoToCountryMap.containsKey(postSwiftCodeDTO.getCountryISO2())){
+            throw new CountryISODoesNotExistException("Provided CountryIso does not exist");
+        }
         if (!postSwiftCodeDTO.getCountryISO2().equalsIgnoreCase(countryISOFromSwiftCode)) {
             throw new CountryISODoesNotMatchWithSwiftCodeException("CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO");
         }
@@ -113,11 +115,9 @@ public class SwiftCodeService {
 
     public Object getSwiftCodesByCountryISO2(String countryISO2){
         List<SwiftCode> listOfSwiftCodes = swiftCodeRepository.findAllByCountryISO2(countryISO2);
-
         if(listOfSwiftCodes.isEmpty()){
             throw new NotFoundElementException("No Banks with entered countryISO in database");
         }
-
         CountryDetailsDTO countryDetailsDTO = new CountryDetailsDTO(countryISO2,
                 listOfSwiftCodes.stream()
                         .findFirst()
