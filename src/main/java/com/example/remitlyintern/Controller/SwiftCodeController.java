@@ -3,7 +3,6 @@ import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
 import com.example.remitlyintern.Service.SwiftCodeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +12,35 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/swift-codes")
 @Validated
 public class SwiftCodeController {
+
+    /**
+     *  @GetMapping("/{swiftCode}") - Retrieves detailed information about the provided SWIFT code, including:
+     *  - address
+     *  - bankName
+     *  - countryISO2
+     *  - countryName
+     *  - isHeadquarter
+     *  - swiftCode
+     *  If the SWIFT code ends with "XXX" (indicating it is a headquarter), information about its branches is also included.
+     *
+     *  @GetMapping("/country/{countryISO2code}") - Returns all SWIFT codes associated with the specified country ISO2 code.
+     *
+     *  @DeleteMapping("/{swift_code}") - Deletes a record from the database based on the provided SWIFT code.
+     *  If the SWIFT code ends with "XXX", the `parent_swift_code` of its children is set to null.
+     *
+     *  @PostMapping - Adds a new SWIFT code to the database. The request body should include the following fields:
+     *  {
+     *     "address": "TEST STREET",
+     *     "bankName": "TEST NAME",
+     *     "countryISO2": "TEST ISO2",
+     *     "countryName": "TEST COUNTRY NAME",
+     *     "isHeadquarter": false,
+     *     "swiftCode": "TEST SWIFTCODE"
+     *  }
+     *  Fields `countryISO2` and `swiftCode` are validated using regular expressions.
+     *  The provided `countryISO2` is also checked to ensure it matches a key in the `CountryISO2Map`.
+     *
+     */
 
     private final SwiftCodeService swiftCodeService;
 

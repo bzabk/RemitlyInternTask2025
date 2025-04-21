@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SwiftCodeRepository extends JpaRepository<SwiftCode,String> {
-
+    /**
+     * Repository interface for managing SwiftCode entities.
+     * Extends JpaRepository to provide basic CRUD operations and custom query methods.
+     */
     Optional<SwiftCode> findBySwiftCode(String swiftCode);
 
     boolean existsBySwiftCode(String swiftCode);

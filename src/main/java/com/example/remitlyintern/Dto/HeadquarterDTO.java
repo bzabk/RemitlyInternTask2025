@@ -16,6 +16,11 @@ import java.util.List;
 })
 public class HeadquarterDTO{
 
+    /**
+     * DTO is designed to provide the proper display layout for branch data in the '@GetMapping("/{swiftCode}")' request.
+     * This DTO is used when provided swiftCode ends with XXX (swiftCode represents headquarter bank)
+     */
+
     private String address;
     private String bankName;
     private String countryISO2;

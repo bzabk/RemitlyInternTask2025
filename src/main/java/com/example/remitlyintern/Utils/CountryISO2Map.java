@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 public class CountryISO2Map {
 
+    /**
+     * Class stores HashMap with keys as country ISO codes and values as country names.
+     */
     public static final HashMap<String, String> countryIsoToCountryMap = createCountryISO2Map();
 
     private static HashMap<String,String> createCountryISO2Map() {

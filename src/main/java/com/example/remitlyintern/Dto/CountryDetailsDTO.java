@@ -11,6 +11,11 @@ import java.util.List;
         "SwiftCodes"
 })
 public class CountryDetailsDTO{
+
+    /**
+     * DTO is designed to provide the proper display layout in the '@GetMapping("/country/{countryISO2code}")' request.
+     */
+
     private String countryName;
     @JsonProperty("SwiftCodes")
     private List<BankBranchDTO> branchDTOList;

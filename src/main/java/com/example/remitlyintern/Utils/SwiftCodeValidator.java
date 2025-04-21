@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SwiftCodeValidator {
-
+    /**
+     * This class contains methods for validating the user's provided SwiftCode in a POST request.
+     */
     private final SwiftCodeRepository swiftCodeRepository;
 
     public SwiftCodeValidator(SwiftCodeRepository swiftCodeRepository) {

@@ -8,7 +8,6 @@ import com.example.remitlyintern.Utils.SwiftCodeMapper;
 import com.example.remitlyintern.Utils.SwiftCodeValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -26,7 +25,16 @@ public class SwiftCodeService {
 
     @Transactional
     public Object postNewSwiftCodeRecord(PostSwiftCodeDTO postSwiftCodeDTO){
-
+         /**
+         * Creates and saves a new SwiftCode record in the database.
+         *
+         * This method validates the provided SwiftCode data, maps it to an entity and
+         * sets up relationships (e.g., headquarter and branches)
+         *
+         * @param postSwiftCodeDTO provided swiftCode data in post request
+         * @return a success message indicating that the SwiftCode was saved
+         * @throws ValidationException if the provided SwiftCode data is invalid
+         */
         swiftCodeValidator.validateSwiftCodeForCreation(postSwiftCodeDTO);
 
         SwiftCode newSwiftCode = SwiftCodeMapper.toEntity(postSwiftCodeDTO);
@@ -37,6 +45,10 @@ public class SwiftCodeService {
     }
 
     private void setupSwiftCodeRelationships(SwiftCode swiftCode) {
+        /**
+         * Method serves the purpose of handling the relationship between swift_code and swift_code_parent in the database
+         * when a new SwiftCode is posted.
+         */
         if (swiftCode.getHeadquarter()) {
             setupBranchesToHeadquarter(swiftCode);
         } else {
@@ -45,12 +57,20 @@ public class SwiftCodeService {
     }
 
     private void assignToExistingHeadquarter(SwiftCode branch) {
+        /**
+         * If a branch bank is posted, we check whether its headquarters exist in the database.
+         * If so, we assign the branch to its headquarters.
+         */
         String headquarterSwiftCode = branch.getSwiftCode().substring(0, 8) + "XXX";
         swiftCodeRepository.findBySwiftCode(headquarterSwiftCode)
                 .ifPresent(branch::setParentSwiftCode);
     }
 
     private void setupBranchesToHeadquarter(SwiftCode headquarter) {
+        /**
+         * If a headquarters bank is posted, we check whether there are any branch banks connected to
+         * the provided bank. If so, we update the `swift_code_parent` field in the branch banks.
+         */
         String mainPart = headquarter.getSwiftCode().substring(0, 9);
         List<SwiftCode> branches = swiftCodeRepository.findAllBySwiftCodeStartingWithAndHeadquarterFalse(mainPart);
         branches.forEach(branch -> {
@@ -61,20 +81,27 @@ public class SwiftCodeService {
 
     @Transactional
     public Object deleteRecordBySwiftCode(String swiftCode) {
-        SwiftCode swiftCodeToDelete = swiftCodeRepository.findBySwiftCode(swiftCode)
+        /**
+         * Method deletes SwiftCode when @DeleteMapping("/{swift_code}") is executed
+         * There is no need to set null in children's parent_swift_code @PreRemove in SwiftCode class handles it
+         * @throws RecordNotFoundException when there is no record in database with provided SwiftCode
+         *
+         */
+        swiftCodeRepository.findBySwiftCode(swiftCode)
                 .orElseThrow(() -> new RecordNotFoundException("SWIFT code not found in the database"));
 
-        if (swiftCodeToDelete.getHeadquarter() && swiftCodeToDelete.getChildren() != null) {
-            for (SwiftCode child : swiftCodeToDelete.getChildren()) {
-                child.setParentSwiftCode(null);
-                swiftCodeRepository.save(child);
-            }
-        }
         swiftCodeRepository.deleteSwiftCodeBySwiftCode(swiftCode);
         return "Swift Code was deleted successfully";
     }
 
     public Object getSwiftCodeDetails(String swiftCode) {
+        /**
+         * Handles the retrieval of SWIFT code details via a GET request to the endpoint "/{swiftCode}".
+         *
+         * @param swiftCode the SWIFT code to retrieve details for
+         * @return the details of the SWIFT code, either as a headquarter or branch DTO
+         * @throws RecordNotFoundException if the provided SWIFT code does not exist in the database
+         */
         SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
                 .orElseThrow(() -> new RecordNotFoundException("The provided SWIFT code does not exist in the database"));
 
@@ -86,6 +113,10 @@ public class SwiftCodeService {
     }
 
     public CountryDetailsDTO getSwiftCodesByCountryISO2(String countryISO2) {
+        /**
+         * Handles the @GetMapping("/country/{countryISO2code}") request.
+         * Retrieves all SWIFT codes for a given country based on its ISO2 code.
+         */
         List<SwiftCode> swiftCodes = swiftCodeRepository.findAllByCountryISO2(countryISO2);
 
         if (swiftCodes.isEmpty()) {

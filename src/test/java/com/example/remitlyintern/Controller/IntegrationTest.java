@@ -57,7 +57,7 @@ public class IntegrationTest {
     void shouldVerifyPostRequestInH2Database(){
 
         PostSwiftCodeDTO postSwiftCodeDTO = new PostSwiftCodeDTO(
-                "swietokrzyska",
+                "TEST STREET",
                 "TEST BANK",
                 "PL",
                 "Poland",
@@ -78,7 +78,7 @@ public class IntegrationTest {
     @Test
     void shouldVerifyPostAndDeleteRequests() throws Exception{
         PostSwiftCodeDTO postSwiftCodeDTO = new PostSwiftCodeDTO(
-                "swietokrzyska",
+                "TEST STREET",
                 "TEST BANK",
                 "PL",
                 "Poland",
@@ -110,7 +110,7 @@ public class IntegrationTest {
     @Test
     void shouldReturnBadRequestAfterTwoDeleteRequest() throws Exception{
         PostSwiftCodeDTO postSwiftCodeDTO = new PostSwiftCodeDTO(
-                "swietokrzyska",
+                "TEST STREET",
                 "TEST BANK",
                 "PL",
                 "Poland",

@@ -11,7 +11,15 @@ import java.util.List;
 @Entity
 @Table(name = "swift_codes_db")
 public class SwiftCode {
-
+    /**
+     * Represents the SwiftCode entity, which stores information about bank SWIFT codes.
+     * This class is mapped to the `swift_codes_db` table in the database and contains
+     * details such as the SWIFT code, bank name, address, country, and whether it is a headquarters.
+     * It also defines relationships with other SWIFT codes (e.g., parent-child relationships).
+     *
+     * The field representing whether a bank is a headquarters is named `headquarter` instead of `isHeadquarter`
+     * to avoid potential issues with displaying the property in the response body as `isHeadquarter`.
+     */
     @Id
     @Column(name="swift_code",unique = true, length=11)
     private String swiftCode;
@@ -42,9 +50,16 @@ public class SwiftCode {
     private SwiftCode parentSwiftCode;
 
     @OneToMany(mappedBy = "parentSwiftCode",
-    cascade = {},orphanRemoval = false)
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE},orphanRemoval = false)
     @JsonManagedReference
     private List<SwiftCode> children = new ArrayList<>();
+
+    @PreRemove
+    private void preRemove() {
+        for (SwiftCode child : children) {
+            child.setParentSwiftCode(null);
+        }
+    }
 
     public SwiftCode(String swiftCode, String bankName, String address, String countryISO2, String countryName, boolean isHeadquarter, SwiftCode parentSwiftCode, List<SwiftCode> children) {
         this.swiftCode = swiftCode;

@@ -13,6 +13,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class BranchWithCountryName{
 
+    /**
+     * DTO is designed to provide the proper display layout for branch data in the '@GetMapping("/{swiftCode}")' request.
+     * This DTO is used when provided swiftCode does not end with XXX (swiftCode represent branch bank)
+     */
+
     private String address;
     private String bankName;
     @JsonProperty("isHeadquarter")

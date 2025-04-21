@@ -11,6 +11,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "swiftCode"
 })
 public class BankBranchDTO {
+
+    /**
+     * DTO is designed to provide the proper display layout for branch data in the '@GetMapping("/{swiftCode}")' request.
+     * This DTO is used when provided swiftCode is a branch to certain headquarters (swiftCode represents headquarter bank)
+     */
+
     private String address;
     private String bankName;
     @JsonProperty("isHeadquarter")

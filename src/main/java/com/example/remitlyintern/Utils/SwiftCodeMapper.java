@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 
 public class SwiftCodeMapper {
 
+    /**
+     * This class provides static mapping methods between different DTO models.
+     */
+
     public static SwiftCode toEntity(PostSwiftCodeDTO dto) {
         return new SwiftCode(
                 dto.getSwiftCode(),

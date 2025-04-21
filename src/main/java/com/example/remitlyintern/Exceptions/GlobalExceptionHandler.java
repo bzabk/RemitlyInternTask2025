@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * The `GlobalExceptionHandler` class is responsible for handling exceptions globally in the application.
+     *
+     * It uses the `@ControllerAdvice` annotation to intercept exceptions thrown in controllers
+     * and return appropriate HTTP responses.
+     */
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e) {
         String errorMessage = e.getConstraintViolations().stream()
