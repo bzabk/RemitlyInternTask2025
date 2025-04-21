@@ -3,9 +3,9 @@ package com.example.remitlyintern.Controller;
 import com.example.remitlyintern.Dto.BranchWithCountryName;
 import com.example.remitlyintern.Dto.PostSwiftCodeDTO;
 import com.example.remitlyintern.Exceptions.CountryISODoesNotExistException;
-import com.example.remitlyintern.Exceptions.CountryISODoesNotMatchWithSwiftCodeException;
-import com.example.remitlyintern.Exceptions.HeadquarterAndSwiftCodeConflictException;
-import com.example.remitlyintern.Exceptions.NotFoundElementException;
+import com.example.remitlyintern.Exceptions.CountryISOSwiftCodeMismatchException;
+import com.example.remitlyintern.Exceptions.HeadquarterSwiftCodeMismatchException;
+import com.example.remitlyintern.Exceptions.RecordNotFoundException;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
 import com.example.remitlyintern.Service.SwiftCodeService;
@@ -108,7 +108,7 @@ public class SwiftCodeControllerTest {
     @Test
     void shouldReturnNotFoundWhenSwiftCodeIsNotInDatabase() throws Exception {
         when(swiftCodeService.getSwiftCodeDetails(any(String.class)))
-                .thenThrow(new NotFoundElementException("The provided SWIFT code does not exist in the database"));
+                .thenThrow(new RecordNotFoundException("The provided SWIFT code does not exist in the database"));
 
         mockMvc.perform(get("/v1/swift-codes/BCHICLQQIMP"))
                 .andExpect(status().isNotFound())
@@ -143,7 +143,7 @@ public class SwiftCodeControllerTest {
     void shouldReturnNotFoundWhenCountryIsoNotInDataBase() throws Exception{
 
         when(swiftCodeService.getSwiftCodesByCountryISO2(any(String.class)))
-                .thenThrow(new NotFoundElementException("No Banks with entered countryISO in database"));
+                .thenThrow(new RecordNotFoundException("No Banks with entered countryISO in database"));
 
         mockMvc.perform(get("/v1/swift-codes/country/QA"))
                 .andExpect(status().isNotFound())
@@ -225,7 +225,6 @@ public class SwiftCodeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Length of bankName must be between 1 and 100"));
     }
-    // regex w countryIso nie pasuje
     @Test
     void shouldReturnBadRequestWhenCountryISOIsLongerThan2Signs() throws Exception{
         mockMvc.perform(post("/v1/swift-codes")
@@ -266,7 +265,7 @@ public class SwiftCodeControllerTest {
     void shouldReturnBadRequestWhenCountryISODoesNotMatchWith5and6SignFromSwiftCode() throws Exception{
 
         when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
-                .thenThrow(new CountryISODoesNotMatchWithSwiftCodeException(
+                .thenThrow(new CountryISOSwiftCodeMismatchException(
                         "CountryISO code does not match with 5's and 6's letter from SwiftCode which are responsible for CountryISO"));
         mockMvc.perform(post("/v1/swift-codes")
                         .contentType("application/json")
@@ -308,7 +307,7 @@ public class SwiftCodeControllerTest {
     void shouldThrowExceptionWhenSwiftCodeNotEndingWithXXXAndHeadquarterIsTrue() throws Exception {
 
         when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
-                .thenThrow(new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+                .thenThrow(new HeadquarterSwiftCodeMismatchException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
 
         mockMvc.perform(post("/v1/swift-codes")
                         .contentType("application/json")
@@ -330,7 +329,7 @@ public class SwiftCodeControllerTest {
     void shouldReturnBadRequestWhenSwiftCodesEndWithXXXAndHeadquarterIsFalse() throws Exception {
 
         when(swiftCodeService.postNewSwiftCodeRecord(any(PostSwiftCodeDTO.class)))
-                .thenThrow(new HeadquarterAndSwiftCodeConflictException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
+                .thenThrow(new HeadquarterSwiftCodeMismatchException("Provided swiftCode suggests that it is a headquarter but user provided false in headquarter field"));
 
         mockMvc.perform(post("/v1/swift-codes")
                         .contentType("application/json")
@@ -369,6 +368,8 @@ public class SwiftCodeControllerTest {
                 .andExpect(content().string("Provided CountryIso does not exist"));
 
     }
+
+
 
 
 

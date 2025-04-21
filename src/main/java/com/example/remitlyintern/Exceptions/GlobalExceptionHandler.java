@@ -2,15 +2,11 @@ package com.example.remitlyintern.Exceptions;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ReportAsSingleViolation;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.ResourceBundle;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,7 +32,7 @@ public class GlobalExceptionHandler {
                 .body(errorMessage);
     }
 
-    @ExceptionHandler(NotFoundElementException.class)
+    @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<Object> handleNotFoundElement(Exception e){
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -49,14 +45,14 @@ public class GlobalExceptionHandler {
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(HeadquarterAndSwiftCodeConflictException.class)
+    @ExceptionHandler(HeadquarterSwiftCodeMismatchException.class)
     public ResponseEntity<Object> handleHeadquarterAndSwiftCodeConflictException(Exception e){
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(CountryISODoesNotMatchWithSwiftCodeException.class)
+    @ExceptionHandler(CountryISOSwiftCodeMismatchException.class)
     public ResponseEntity<Object> handleCountryISOSwiftCodeMisMatch(Exception e){
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

@@ -13,7 +13,7 @@ import java.util.List;
 public class CountryDetailsDTO{
     private String countryName;
     @JsonProperty("SwiftCodes")
-    private List<BranchDTO> branchDTOList;
+    private List<BankBranchDTO> branchDTOList;
     private String countryISO2;
 
     public CountryDetailsDTO(String countryName, String countryISO2) {
@@ -40,11 +40,11 @@ public class CountryDetailsDTO{
         this.countryName = countryName;
     }
 
-    public List<BranchDTO> getBranchDTOList() {
+    public List<BankBranchDTO> getBranchDTOList() {
         return branchDTOList;
     }
 
-    public void setBranchDTOList(List<BranchDTO> branchDTOList) {
+    public void setBranchDTOList(List<BankBranchDTO> branchDTOList) {
         this.branchDTOList = branchDTOList;
     }
 }

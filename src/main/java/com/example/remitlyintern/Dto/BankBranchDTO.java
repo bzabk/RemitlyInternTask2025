@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "isHeadquarter",
         "swiftCode"
 })
-public class BranchDTO {
+public class BankBranchDTO {
     private String address;
     private String bankName;
     @JsonProperty("isHeadquarter")
@@ -18,7 +18,7 @@ public class BranchDTO {
     private String swiftCode;
     private String countryISO2;
 
-    public BranchDTO(String address, String bankName, boolean headquarter, String swiftCode, String countryISO2) {
+    public BankBranchDTO(String address, String bankName, boolean headquarter, String swiftCode, String countryISO2) {
         this.address = address;
         this.bankName = bankName;
         this.headquarter = headquarter;

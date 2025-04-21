@@ -14,26 +14,29 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class SwiftCodeController {
 
-    @Autowired
-    private  SwiftCodeService swiftCodeService;
+    private final SwiftCodeService swiftCodeService;
+
+    public SwiftCodeController(SwiftCodeService swiftCodeService) {
+        this.swiftCodeService = swiftCodeService;
+    }
 
 
     @GetMapping("/{swiftCode}")
-    public ResponseEntity<Object> findSwiftCodeDetails(@PathVariable
+    public ResponseEntity<?> findSwiftCodeDetails(@PathVariable
                                                       @Pattern(regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
                                                               message = "Input does not satisfy required swift code regex")  String swiftCode){
         return ResponseEntity.ok(swiftCodeService.getSwiftCodeDetails(swiftCode));
     }
 
     @GetMapping("/country/{countryISO2code}")
-    public ResponseEntity<Object> findSwiftCodesByCountryISO(@PathVariable
+    public ResponseEntity<?> findSwiftCodesByCountryISO(@PathVariable
                                                                  @Pattern(regexp = "^[A-Z]{2}$", message = "Country ISO code must be exactly two uppercase letters")
                                                                  String countryISO2code){
         return ResponseEntity.ok(swiftCodeService.getSwiftCodesByCountryISO2(countryISO2code));
     }
 
     @DeleteMapping("/{swift_code}")
-    public ResponseEntity<Object> deleteBySwiftCode(@PathVariable
+    public ResponseEntity<?> deleteBySwiftCode(@PathVariable
                                                     @Pattern(regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
                                                             message = "Input does not satisfy required swift code regex") String swift_code){
         return ResponseEntity.ok(swiftCodeService.deleteRecordBySwiftCode(swift_code));
@@ -41,19 +44,8 @@ public class SwiftCodeController {
 
 
     @PostMapping
-    public ResponseEntity<Object> postNewSwiftCode(@RequestBody @Valid PostSwiftCodeDTO postSwiftCodeDTO){
+    public ResponseEntity<?> postNewSwiftCode(@RequestBody @Valid PostSwiftCodeDTO postSwiftCodeDTO){
         return ResponseEntity.ok(swiftCodeService.postNewSwiftCodeRecord(postSwiftCodeDTO));
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }
