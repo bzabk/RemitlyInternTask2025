@@ -26,7 +26,7 @@ public class SwiftCodeValidator {
         validateSwiftCodeUniqueness(postSwiftCodeDTO.getSwiftCode());
     }
 
-    private void validateCountryIsoExists(String countryISO2) {
+    public void validateCountryIsoExists(String countryISO2) {
         if (!CountryISO2Map.countryIsoToCountryMap.containsKey(countryISO2)) {
             throw new CountryISODoesNotExistException("Provided CountryIso does not exist in a ISO standard");
         }

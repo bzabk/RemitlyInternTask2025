@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,7 +61,7 @@ public class IntegrationTest {
                 "TEST STREET",
                 "TEST BANK",
                 "PL",
-                "Poland",
+                "poland",
                 true,
                 "ALBPPLPWXXX"
         );
@@ -72,7 +73,7 @@ public class IntegrationTest {
                 String.class
         );
         assertEquals(200, postResponse.getStatusCode().value());
-        assertEquals("SwiftCode successfully saved in database",postResponse.getBody());
+        assertEquals("SwiftCode successfully saved in database, CountryName was standardized to: POLAND",postResponse.getBody());
     }
 
     @Test

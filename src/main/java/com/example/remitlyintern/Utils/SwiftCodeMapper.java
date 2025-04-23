@@ -21,7 +21,7 @@ public class SwiftCodeMapper {
                 dto.getBankName(),
                 dto.getAddress(),
                 dto.getCountryISO2(),
-                dto.getCountryName(),
+                dto.getCountryName().toUpperCase(),
                 dto.Headquarter(),
                 null,
                 null

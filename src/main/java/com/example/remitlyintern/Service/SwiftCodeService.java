@@ -4,11 +4,13 @@ import com.example.remitlyintern.Dto.*;
 import com.example.remitlyintern.Exceptions.*;
 import com.example.remitlyintern.Model.SwiftCode;
 import com.example.remitlyintern.Repository.SwiftCodeRepository;
+import com.example.remitlyintern.Utils.CountryISO2Map;
 import com.example.remitlyintern.Utils.SwiftCodeMapper;
 import com.example.remitlyintern.Utils.SwiftCodeValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SwiftCodeService {
@@ -35,13 +37,22 @@ public class SwiftCodeService {
          * @return a success message indicating that the SwiftCode was saved
          * @throws ValidationException if the provided SwiftCode data is invalid
          */
-        swiftCodeValidator.validateSwiftCodeForCreation(postSwiftCodeDTO);
+         String returnInformation;
 
+        swiftCodeValidator.validateSwiftCodeForCreation(postSwiftCodeDTO);
+        String standardizedCountryName = CountryISO2Map.countryIsoToCountryMap.get(postSwiftCodeDTO.getCountryISO2());
+        if(!Objects.equals(standardizedCountryName, postSwiftCodeDTO.getCountryName())){
+            postSwiftCodeDTO.setCountryName(standardizedCountryName.toUpperCase());
+            returnInformation = "SwiftCode successfully saved in database, CountryName was standardized to: "+standardizedCountryName.toUpperCase();
+        }else{
+            returnInformation = "SwiftCode successfully saved in database";
+        }
         SwiftCode newSwiftCode = SwiftCodeMapper.toEntity(postSwiftCodeDTO);
 
         setupSwiftCodeRelationships(newSwiftCode);
         swiftCodeRepository.save(newSwiftCode);
-        return "SwiftCode successfully saved in database";
+
+        return returnInformation;
     }
 
     private void setupSwiftCodeRelationships(SwiftCode swiftCode) {
@@ -99,7 +110,7 @@ public class SwiftCodeService {
          * Handles the retrieval of SWIFT code details via a GET request to the endpoint "/{swiftCode}".
          *
          * @param swiftCode the SWIFT code to retrieve details for
-         * @return the details of the SWIFT code, either as a headquarter or branch DTO
+         * @return the details of the SWIFT code, either as a headquarters or branch DTO
          * @throws RecordNotFoundException if the provided SWIFT code does not exist in the database
          */
         SwiftCode foundSwiftCode = swiftCodeRepository.findBySwiftCode(swiftCode)
