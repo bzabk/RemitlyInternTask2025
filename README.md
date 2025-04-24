@@ -1,9 +1,11 @@
 # Remitly Home Assignment 2025
-
-![Java](https://img.shields.io/badge/Java-21-blue)  
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)  
-![Spring](https://img.shields.io/badge/Spring-Boot-green)  
+![Java](https://img.shields.io/badge/Java-21-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
 [![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)](https://www.docker.com/)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+
 
 ## Overview
 
